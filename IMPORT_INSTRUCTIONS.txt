@@ -1,0 +1,174 @@
+================================================================================
+                    📊 IMPORT 94 RESTAURANTS (Seed Data)
+================================================================================
+
+You have comprehensive restaurant data ready to import!
+
+Location: scripts/complete-seed-data.sql
+Restaurants: 94 (organized by 7 cuisines)
+Time to import: ~30 seconds
+
+================================================================================
+STEP-BY-STEP IMPORT GUIDE
+================================================================================
+
+STEP 1: Open Supabase
+-------
+1. Go to: https://app.supabase.com
+2. Login with your account
+3. Select project: riyadh100
+
+STEP 2: Open SQL Editor
+-------
+1. Click "SQL Editor" (left sidebar)
+2. Click "New Query" (top button)
+
+STEP 3: Copy Your Data
+-------
+1. Open file on your computer:
+   /Users/ahmad/Workshop/Create Modern UI Design/riyadh-restaurants-voting/scripts/complete-seed-data.sql
+
+2. Copy ALL content (Ctrl+A to select all, Ctrl+C to copy)
+
+STEP 4: Paste into Supabase
+-------
+1. Click in the SQL Editor text area
+2. Paste your data (Ctrl+V)
+3. You should see SQL statements for all restaurants
+
+STEP 5: Run the Import
+-------
+1. Click the "RUN" button (or press Cmd+Enter)
+2. Wait 10-30 seconds...
+3. You should see:
+   "✓ Success!"
+   "94 rows inserted"
+   "Total restaurants: 94"
+
+STEP 6: Verify Success
+-------
+1. Go to "Table Editor" (left sidebar)
+2. Click "restaurants" table
+3. Scroll down - you should see all 94 restaurants!
+4. Top restaurants:
+   - Myazu: 210 votes
+   - Marble: 200 votes
+   - Rüya: 200 votes
+
+That's it! 🎉
+
+================================================================================
+WHAT YOU'RE IMPORTING
+================================================================================
+
+94 Real Riyadh Restaurants Across 7 Categories:
+
+1. SAUDI CUISINE (19 restaurants)
+   Top: Al Romansiah (175), Shawarma House (180), Taleed (185)
+
+2. JAPANESE CUISINE (18 restaurants)
+   Top: Myazu (210), Kuuru (200), Akira Back (185)
+
+3. ITALIAN CUISINE (12 restaurants)
+   Top: Il Baretto (195), Carbone (190), Cipriani (185)
+
+4. AMERICAN CUISINE (15 restaurants)
+   Top: Marble (200), Smokey Beards Q (185), Beefbar (180)
+
+5. INDIAN CUISINE (10 restaurants)
+   Top: Gymkhana (195), Lunch Room (165), Ruhi (160)
+
+6. FRENCH CUISINE (12 restaurants)
+   Top: Benoit (190), LPM (185), Bagatelle (180)
+
+7. LEBANESE & MIDDLE EASTERN (14 restaurants)
+   Top: Rüya (200), Em Sherif (195), Lusin (175)
+
+Each restaurant has:
+✓ Real name (verified)
+✓ Google Maps link
+✓ Vote count (105-210)
+✓ Status: approved
+
+================================================================================
+AFTER IMPORT
+================================================================================
+
+1. ✅ Verify in Table Editor (see 94 restaurants)
+2. ✅ Make sure Realtime is enabled for both tables
+3. ✅ Run: npm run dev
+4. ✅ Open: http://localhost:5173
+5. ✅ See all 94 restaurants loaded!
+6. ✅ Users can vote and create restaurants
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+❌ "Error: syntax error"
+   → Make sure you copied the ENTIRE file
+   → Make sure SQL Editor was empty before pasting
+   → Try copying just the first 20 lines to test
+
+❌ "No rows inserted"
+   → Did you run supabase/schema.sql first?
+   → Check that restaurants table exists
+   → Verify Row Level Security allows inserts
+
+❌ "Already imported - duplicate rows"
+   → Check Table Editor - you have 94 restaurants ✓
+   → If you want to reimport, delete all rows first
+
+❌ "Can't see restaurants in app"
+   → Make sure Realtime is enabled
+   → Refresh the app (Ctrl+R)
+   → Clear browser cache
+
+================================================================================
+QUICK TEST
+================================================================================
+
+After importing, test the app:
+
+1. Open: http://localhost:5173
+2. You should see:
+   [ ] List of 94 restaurants
+   [ ] Top restaurant: Myazu with 210 votes
+   [ ] All cuisine categories represented
+   [ ] Google Maps links work
+
+3. Try voting:
+   [ ] Click vote on any restaurant
+   [ ] Vote count increases
+   [ ] Button changes to "✓ Voted"
+
+4. Try creating:
+   [ ] Click "Add Restaurant" tab
+   [ ] Enter name and Google link
+   [ ] It appears in list
+
+All working? Perfect! 🎉
+
+================================================================================
+FILE LOCATION
+================================================================================
+
+File to import: scripts/complete-seed-data.sql
+
+Full path:
+/Users/ahmad/Workshop/Create Modern UI Design/riyadh-restaurants-voting/scripts/complete-seed-data.sql
+
+Size: ~135 lines
+Restaurants: 94
+Execution time: ~30 seconds
+
+================================================================================
+
+Ready to import? Let's go! 🚀
+
+1. Copy from: scripts/complete-seed-data.sql
+2. Paste in: Supabase SQL Editor
+3. Click: RUN
+4. See: 94 restaurants imported! ✅
+
+================================================================================
