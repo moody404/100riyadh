@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[env]
+  [env.production]
+    environment = { VITE_SUPABASE_URL = "https://cincckjmkglcrbiupvip.supabase.co", VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpbmNja2pta2dsY3JiaXVwdmlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyNTY1ODMsImV4cCI6MjA3NzgzMjU4M30.JKXDw1Nr4HBlZ5Nq6obXnX7CK-h2Ww5PRhM8jvslls0" }

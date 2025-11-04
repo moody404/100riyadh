@@ -71,6 +71,7 @@ export default {
 </script>
 
 <style scoped>
+/* Mobile-first design */
 #app {
   min-height: 100vh;
   display: flex;
@@ -81,53 +82,58 @@ export default {
 .navbar {
   background: white;
   border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
 .nav-container {
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
-  padding: 16px 20px;
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex: 1;
+  min-width: auto;
 }
 
 .brand-emoji {
-  font-size: 28px;
+  font-size: 24px;
 }
 
 .brand-text {
   margin: 0;
-  color: #333;
-  font-size: 20px;
-  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .nav-links {
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .nav-button {
-  padding: 8px 16px;
+  padding: 8px 12px;
   border: none;
   background: transparent;
   color: #666;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .nav-button:hover {
@@ -136,32 +142,97 @@ export default {
 }
 
 .nav-button.active {
-  color: #4CAF50;
-  background: #e8f5e9;
+  color: white;
+  background: #4CAF50;
+  font-weight: 700;
 }
 
 .main-content {
   flex: 1;
-  padding: 40px 20px;
+  padding: 0;
+  background: #fafafa;
 }
 
 .footer {
-  background: #333;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   color: white;
   text-align: center;
-  padding: 32px 20px;
-  margin-top: 40px;
+  padding: 24px 16px;
+  margin-top: auto;
 }
 
 .footer p {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .footer-secondary {
-  margin-top: 8px;
-  opacity: 0.8;
-  font-size: 12px;
+  margin-top: 6px;
+  opacity: 0.85;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Tablet screens */
+@media (min-width: 640px) {
+  .nav-container {
+    padding: 14px 20px;
+    gap: 16px;
+  }
+
+  .brand-emoji {
+    font-size: 26px;
+  }
+
+  .brand-text {
+    font-size: 18px;
+  }
+
+  .nav-button {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .main-content {
+    padding: 20px 0;
+  }
+
+  .footer {
+    padding: 28px 20px;
+  }
+}
+
+/* Desktop screens */
+@media (min-width: 1024px) {
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    flex-wrap: nowrap;
+    gap: 32px;
+  }
+
+  .brand-emoji {
+    font-size: 28px;
+  }
+
+  .brand-text {
+    font-size: 20px;
+  }
+
+  .nav-button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .main-content {
+    padding: 40px 20px;
+  }
+
+  .footer {
+    padding: 32px 20px;
+  }
 }
 </style>
 

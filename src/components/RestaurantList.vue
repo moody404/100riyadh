@@ -120,45 +120,57 @@ export default {
 </script>
 
 <style scoped>
+/* Mobile-first responsive design */
 .restaurant-list-container {
-  max-width: 1000px;
+  width: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 12px;
 }
 
 .header {
-  margin-bottom: 32px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  padding: 16px;
+  border-radius: 12px;
+  color: white;
 }
 
 .header h1 {
-  margin: 0 0 16px 0;
-  color: #333;
-  font-size: 28px;
+  margin: 0 0 12px 0;
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .stats {
   display: flex;
-  gap: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .stat {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px 12px;
+  border-radius: 8px;
+  flex: 1;
+  min-width: 140px;
 }
 
 .stat-label {
-  color: #666;
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .stat-value {
-  color: #4CAF50;
-  font-size: 24px;
-  font-weight: bold;
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .loading-state {
@@ -173,7 +185,7 @@ export default {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
+  border: 4px solid #f0f0f0;
   border-top: 4px solid #4CAF50;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -189,34 +201,90 @@ export default {
   text-align: center;
   padding: 60px 20px;
   color: #999;
-  background: #f9f9f9;
-  border-radius: 8px;
+  background: white;
+  border: 2px dashed #e0e0e0;
+  border-radius: 12px;
+  font-size: 15px;
 }
 
 .restaurants-grid {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .rank {
-  display: inline-block;
-  background: #4CAF50;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
   color: white;
-  padding: 4px 12px;
-  border-radius: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   font-size: 12px;
-  font-weight: bold;
-  margin-right: 8px;
+  font-weight: 700;
 }
 
 .vote-limit-banner {
-  margin-top: 32px;
-  padding: 16px;
-  background: #e3f2fd;
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
   border-left: 4px solid #1976D2;
-  border-radius: 4px;
+  border-radius: 8px;
   color: #1565c0;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
   text-align: center;
+}
+
+/* Tablet screens */
+@media (min-width: 640px) {
+  .restaurant-list-container {
+    padding: 16px;
+  }
+
+  .header {
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-size: 26px;
+  }
+
+  .stat {
+    min-width: 160px;
+    padding: 12px 14px;
+  }
+
+  .restaurants-grid {
+    gap: 10px;
+  }
+}
+
+/* Desktop screens */
+@media (min-width: 1024px) {
+  .restaurant-list-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .header {
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .stat {
+    min-width: 180px;
+  }
+
+  .restaurants-grid {
+    gap: 12px;
+  }
 }
 </style>
