@@ -150,12 +150,27 @@ export async function recordVote(restaurantId) {
   }
 
   // Update restaurant vote count
-  const { error: updateError } = await supabase
-    .rpc('increment_restaurant_votes', { restaurant_id: restaurantId });
+  try {
+    // Get current vote count
+    const { data: restaurant, error: fetchError } = await supabase
+      .from('restaurants')
+      .select('vote_count')
+      .eq('id', restaurantId)
+      .single();
 
-  if (updateError) {
-    console.error('Error updating vote count:', updateError);
-    throw updateError;
+    if (fetchError) throw fetchError;
+
+    // Increment vote count
+    const newVoteCount = (restaurant?.vote_count || 0) + 1;
+    const { error: updateError } = await supabase
+      .from('restaurants')
+      .update({ vote_count: newVoteCount })
+      .eq('id', restaurantId);
+
+    if (updateError) throw updateError;
+  } catch (err) {
+    console.error('Error updating vote count:', err);
+    throw err;
   }
 
   return data ? data[0] : null;

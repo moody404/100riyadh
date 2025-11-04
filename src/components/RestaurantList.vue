@@ -68,7 +68,9 @@ export default {
     async loadRestaurants() {
       this.isLoading = true;
       try {
-        this.restaurants = await getTopRestaurants(100);
+        const data = await getTopRestaurants(100);
+        // Sort by vote count (highest first)
+        this.restaurants = data.sort((a, b) => b.vote_count - a.vote_count);
       } catch (err) {
         console.error('Error loading restaurants:', err);
       } finally {
@@ -87,24 +89,24 @@ export default {
       await this.loadUserVoteCount();
     },
     setupRealtimeListener() {
-      // Subscribe to changes in votes table
+      // Subscribe to changes in votes table (INSERT and UPDATE)
       supabase
         .channel('votes')
         .on(
           'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'votes' },
+          { event: '*', schema: 'public', table: 'votes' },
           () => {
             this.refreshRestaurants();
           }
         )
         .subscribe();
 
-      // Subscribe to changes in restaurants table
+      // Subscribe to changes in restaurants table (INSERT and UPDATE)
       supabase
         .channel('restaurants')
         .on(
           'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'restaurants' },
+          { event: '*', schema: 'public', table: 'restaurants' },
           () => {
             this.refreshRestaurants();
           }
