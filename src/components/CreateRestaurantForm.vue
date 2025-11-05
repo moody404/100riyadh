@@ -73,6 +73,29 @@
             </p>
           </div>
 
+          <!-- Image URL -->
+          <div>
+            <label for="imageUrl" class="block text-sm font-semibold text-gray-700 mb-2">
+              <div class="flex items-center gap-2">
+                <ImageIcon class="w-4 h-4 text-gray-500" />
+                <span>Image URL</span>
+                <span class="text-gray-400 text-xs font-normal">(optional)</span>
+              </div>
+            </label>
+            <input
+              id="imageUrl"
+              v-model="formData.imageUrl"
+              type="url"
+              placeholder="https://images.unsplash.com/... or leave blank for default"
+              :disabled="cannotCreate"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            />
+            <p class="mt-2 text-sm text-gray-500 flex items-center gap-1">
+              <InfoIcon class="w-3 h-3" />
+              <span>Add a photo URL from Unsplash, Google Images, or your own server</span>
+            </p>
+          </div>
+
           <!-- Success Message -->
           <div v-if="success" class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
             <div class="flex items-start gap-3">
@@ -141,6 +164,7 @@ import {
   PlusCircle as PlusCircleIcon,
   Store as StoreIcon,
   MapPin as MapPinIcon,
+  Image as ImageIcon,
   Info as InfoIcon,
   CheckCircle as CheckCircleIcon,
   AlertCircle as AlertCircleIcon,
@@ -155,6 +179,7 @@ export default {
     PlusCircleIcon,
     StoreIcon,
     MapPinIcon,
+    ImageIcon,
     InfoIcon,
     CheckCircleIcon,
     AlertCircleIcon,
@@ -166,7 +191,8 @@ export default {
     return {
       formData: {
         name: '',
-        googleLink: ''
+        googleLink: '',
+        imageUrl: ''
       },
       isLoading: false,
       error: null,
@@ -225,10 +251,10 @@ export default {
       this.success = false;
 
       try {
-        await createRestaurant(this.formData.name, this.formData.googleLink);
+        await createRestaurant(this.formData.name, this.formData.googleLink, this.formData.imageUrl);
 
         this.success = true;
-        this.formData = { name: '', googleLink: '' };
+        this.formData = { name: '', googleLink: '', imageUrl: '' };
         this.cannotCreate = true;
 
         // Emit event to parent to refresh restaurant list

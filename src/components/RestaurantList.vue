@@ -1,81 +1,28 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto">
-      <!-- Header with Stats -->
-      <div class="mb-8">
-        <div class="text-center mb-6">
-          <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-3">
-            <TrophyIcon class="w-10 h-10 text-amber-500" />
-            Best Restaurants in Riyadh
-          </h1>
-          <p class="text-gray-600">Vote for your favorite restaurants and help others discover great places!</p>
-        </div>
+  <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- Simple Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-3">
+          <TrophyIcon class="w-10 h-10 text-amber-500" />
+          Best Restaurants in Riyadh
+        </h1>
+        <p class="text-gray-600 text-lg">
+          {{ restaurants.length }} restaurants • {{ stats.totalVotes }} total votes • Your votes: {{ userVoteCount }}/5
+        </p>
+      </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div class="card p-6 hover:border-primary-500 transition-all">
-            <div class="flex items-center gap-4">
-              <div class="p-3 bg-primary-100 rounded-full">
-                <StoreIcon class="w-6 h-6 text-primary-600" />
-              </div>
-              <div>
-                <p class="text-sm text-gray-600 font-medium">Total Restaurants</p>
-                <p class="text-2xl font-bold text-gray-900">{{ stats.totalRestaurants }}</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="card p-6 hover:border-amber-500 transition-all">
-            <div class="flex items-center gap-4">
-              <div class="p-3 bg-amber-100 rounded-full">
-                <StarIcon class="w-6 h-6 text-amber-600" />
-              </div>
-              <div>
-                <p class="text-sm text-gray-600 font-medium">Total Votes</p>
-                <p class="text-2xl font-bold text-gray-900">{{ stats.totalVotes }}</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="card p-6 hover:border-blue-500 transition-all">
-            <div class="flex items-center gap-4">
-              <div class="p-3 bg-blue-100 rounded-full">
-                <CheckCircleIcon class="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <p class="text-sm text-gray-600 font-medium">Your Votes</p>
-                <p class="text-2xl font-bold text-gray-900">{{ userVoteCount }}<span class="text-sm text-gray-500">/5</span></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="card p-6 hover:border-purple-500 transition-all">
-            <div class="flex items-center gap-4">
-              <div class="p-3 bg-purple-100 rounded-full">
-                <TrendingUpIcon class="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <p class="text-sm text-gray-600 font-medium">Showing</p>
-                <p class="text-2xl font-bold text-gray-900">{{ restaurants.length }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Vote Limit Banner -->
-        <div v-if="userVoteCount >= 5" class="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-lg mb-6">
-          <div class="flex items-center gap-3">
-            <InfoIcon class="w-5 h-5 text-blue-600 flex-shrink-0" />
-            <p class="text-blue-900 font-medium">You've used all 5 votes! Thanks for participating. 🎉</p>
-          </div>
+      <!-- Vote Limit Banner -->
+      <div v-if="userVoteCount >= 5" class="max-w-2xl mx-auto bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-4 rounded-lg mb-8">
+        <div class="flex items-center justify-center gap-2">
+          <CheckCircleIcon class="w-5 h-5 text-blue-600" />
+          <p class="text-blue-900 font-medium">You've used all 5 votes! Thanks for participating. 🎉</p>
         </div>
       </div>
 
       <!-- Loading State -->
       <div v-if="isLoading" class="flex flex-col items-center justify-center py-20">
-        <div class="relative">
-          <div class="w-16 h-16 border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin"></div>
-        </div>
+        <div class="w-16 h-16 border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin"></div>
         <p class="mt-4 text-gray-600 font-medium">Loading restaurants...</p>
       </div>
 
@@ -88,8 +35,8 @@
         <p class="text-gray-600 mb-6">Be the first to add a restaurant to the list!</p>
       </div>
 
-      <!-- Restaurant List -->
-      <div v-else class="space-y-4">
+      <!-- Restaurant Grid -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <RestaurantCard
           v-for="(restaurant, index) in restaurants"
           :key="restaurant.id"
@@ -99,6 +46,14 @@
           :vote-limit-reached="userVoteCount >= 5 && !votedRestaurantIds.includes(restaurant.id)"
           @voted="handleVoted"
         />
+      </div>
+
+      <!-- Debug Info (remove after testing) -->
+      <div v-if="!isLoading" class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
+        <p class="font-semibold text-yellow-900">Debug Info:</p>
+        <p class="text-yellow-800">Restaurants loaded: {{ restaurants.length }}</p>
+        <p class="text-yellow-800">Total restaurants in DB: {{ stats.totalRestaurants }}</p>
+        <p class="text-yellow-800">Total votes in DB: {{ stats.totalVotes }}</p>
       </div>
     </div>
   </div>
@@ -111,10 +66,7 @@ import { supabase } from '../supabaseClient';
 import {
   Trophy as TrophyIcon,
   Store as StoreIcon,
-  Star as StarIcon,
-  CheckCircle as CheckCircleIcon,
-  TrendingUp as TrendingUpIcon,
-  Info as InfoIcon
+  CheckCircle as CheckCircleIcon
 } from 'lucide-vue-next';
 
 export default {
@@ -123,10 +75,7 @@ export default {
     RestaurantCard,
     TrophyIcon,
     StoreIcon,
-    StarIcon,
-    CheckCircleIcon,
-    TrendingUpIcon,
-    InfoIcon
+    CheckCircleIcon
   },
   data() {
     return {
@@ -148,13 +97,18 @@ export default {
     async loadData() {
       this.isLoading = true;
       try {
-        // Load all data in parallel - fixes N+1 query problem
+        console.log('Loading restaurants...');
+
+        // Load all data in parallel
         const [restaurants, votedIds, voteCount, stats] = await Promise.all([
           getTopRestaurants(1000),
           getUserVotedRestaurants(),
           getUserVoteCount(),
           getRestaurantStats()
         ]);
+
+        console.log('Restaurants loaded:', restaurants.length);
+        console.log('Stats:', stats);
 
         this.restaurants = restaurants.sort((a, b) => b.vote_count - a.vote_count);
         this.votedRestaurantIds = votedIds;
@@ -177,6 +131,7 @@ export default {
           'postgres_changes',
           { event: '*', schema: 'public', table: 'votes' },
           () => {
+            console.log('Vote change detected, reloading...');
             this.loadData();
           }
         )
@@ -189,6 +144,7 @@ export default {
           'postgres_changes',
           { event: '*', schema: 'public', table: 'restaurants' },
           () => {
+            console.log('Restaurant change detected, reloading...');
             this.loadData();
           }
         )
