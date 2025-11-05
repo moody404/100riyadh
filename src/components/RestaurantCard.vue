@@ -120,6 +120,9 @@ export default {
       imageError: false
     };
   },
+  mounted() {
+    console.log(`RestaurantCard mounted: #${this.rank} - ${this.restaurant.name} (${this.restaurant.vote_count} votes)`);
+  },
   computed: {
     rankBadgeClass() {
       if (this.rank === 1) {
