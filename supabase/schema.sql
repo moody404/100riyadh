@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS restaurants (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name varchar(100) NOT NULL,
   google_link text NOT NULL,
+  image_url text DEFAULT 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
   vote_count integer DEFAULT 1,
   created_by_device_id varchar(100) NOT NULL,
   status varchar(20) DEFAULT 'approved',

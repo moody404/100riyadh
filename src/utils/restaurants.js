@@ -54,7 +54,7 @@ export async function getRestaurantStats() {
 /**
  * Create a new restaurant
  */
-export async function createRestaurant(name, googleLink) {
+export async function createRestaurant(name, googleLink, imageUrl = null) {
   const deviceId = getDeviceId();
 
   // Check if user already created a restaurant
@@ -72,18 +72,23 @@ export async function createRestaurant(name, googleLink) {
     throw new Error('You can only create one restaurant. Please vote on existing ones instead!');
   }
 
-  // Create the restaurant
+  // Create the restaurant with image URL
+  const restaurantData = {
+    name,
+    google_link: googleLink,
+    vote_count: 1, // Creator's vote counts as first vote
+    created_by_device_id: deviceId,
+    status: 'approved'
+  };
+
+  // Add image URL if provided, otherwise use default
+  if (imageUrl && imageUrl.trim() !== '') {
+    restaurantData.image_url = imageUrl.trim();
+  }
+
   const { data, error } = await supabase
     .from('restaurants')
-    .insert([
-      {
-        name,
-        google_link: googleLink,
-        vote_count: 1, // Creator's vote counts as first vote
-        created_by_device_id: deviceId,
-        status: 'approved'
-      }
-    ])
+    .insert([restaurantData])
     .select();
 
   if (error) {
