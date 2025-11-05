@@ -76,7 +76,7 @@ export async function createRestaurant(name, googleLink, imageUrl = null) {
   const restaurantData = {
     name,
     google_link: googleLink,
-    vote_count: 1, // Creator's vote counts as first vote
+    vote_count: 0, // Will be auto-incremented to 1 by trigger when creator votes
     created_by_device_id: deviceId,
     status: 'approved'
   };
@@ -170,7 +170,7 @@ export async function recordVote(restaurantId) {
     throw new Error('You have reached your voting limit (5 votes). You cannot vote for more restaurants.');
   }
 
-  // Record the vote
+  // Record the vote (database trigger will automatically update vote_count)
   const { data, error } = await supabase
     .from('votes')
     .insert([
@@ -186,29 +186,8 @@ export async function recordVote(restaurantId) {
     throw error;
   }
 
-  // Update restaurant vote count
-  try {
-    // Get current vote count
-    const { data: restaurant, error: fetchError } = await supabase
-      .from('restaurants')
-      .select('vote_count')
-      .eq('id', restaurantId)
-      .single();
-
-    if (fetchError) throw fetchError;
-
-    // Increment vote count
-    const newVoteCount = (restaurant?.vote_count || 0) + 1;
-    const { error: updateError } = await supabase
-      .from('restaurants')
-      .update({ vote_count: newVoteCount })
-      .eq('id', restaurantId);
-
-    if (updateError) throw updateError;
-  } catch (err) {
-    console.error('Error updating vote count:', err);
-    throw err;
-  }
+  // Note: vote_count is now automatically updated by database trigger
+  // No need to manually increment it anymore!
 
   return data ? data[0] : null;
 }
