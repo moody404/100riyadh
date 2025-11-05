@@ -33,6 +33,13 @@
         {{ restaurant.name }}
       </h3>
 
+      <!-- Best Dish -->
+      <div v-if="restaurant.best_dish" class="mb-3 flex items-center gap-1.5">
+        <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full border border-amber-200">
+          🍽️ {{ restaurant.best_dish }}
+        </span>
+      </div>
+
       <!-- Google Maps Link -->
       <a
         :href="restaurant.google_link"
@@ -112,6 +119,9 @@ export default {
       error: null,
       imageError: false
     };
+  },
+  mounted() {
+    console.log(`RestaurantCard mounted: #${this.rank} - ${this.restaurant.name} (${this.restaurant.vote_count} votes)`);
   },
   computed: {
     rankBadgeClass() {
