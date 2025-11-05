@@ -1,100 +1,169 @@
 <template>
-  <div class="restaurant-card">
-    <div class="card-header">
-      <div class="header-left">
-        <h3>{{ restaurant.name }}</h3>
+  <div class="card p-6 hover:shadow-lg hover:scale-[1.01] transition-all duration-200 group">
+    <div class="flex items-start gap-4">
+      <!-- Rank Badge -->
+      <div class="flex-shrink-0">
+        <div :class="rankBadgeClass" class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shadow-md">
+          {{ rank }}
+        </div>
       </div>
-      <div class="vote-count">
-        <span class="vote-icon">⭐</span>
-        {{ restaurant.vote_count }}
+
+      <!-- Restaurant Info -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-start justify-between gap-4 mb-3">
+          <h3 class="text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
+            {{ restaurant.name }}
+          </h3>
+
+          <!-- Vote Count Badge -->
+          <div class="flex items-center gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 px-4 py-2 rounded-full border border-amber-200 shadow-sm flex-shrink-0">
+            <StarIcon class="w-5 h-5 text-amber-500 fill-amber-500" />
+            <span class="font-bold text-gray-900">{{ restaurant.vote_count }}</span>
+            <span class="text-xs text-gray-600">{{ restaurant.vote_count === 1 ? 'vote' : 'votes' }}</span>
+          </div>
+        </div>
+
+        <!-- Google Maps Link -->
+        <a
+          :href="restaurant.google_link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium mb-4 group/link"
+        >
+          <MapPinIcon class="w-4 h-4 group-hover/link:scale-110 transition-transform" />
+          <span class="underline decoration-blue-300 group-hover/link:decoration-blue-600">View on Google Maps</span>
+          <ExternalLinkIcon class="w-3 h-3 opacity-50" />
+        </a>
+
+        <!-- Vote Button -->
+        <div class="flex items-center gap-3">
+          <button
+            @click="handleVote"
+            :disabled="hasVoted || voteLimitReached || isLoading"
+            :class="buttonClass"
+            class="flex-1 sm:flex-initial px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:shadow-sm"
+          >
+            <component :is="buttonIcon" class="w-5 h-5" :class="buttonIconClass" />
+            <span>{{ buttonText }}</span>
+            <Loader2Icon v-if="isLoading" class="w-4 h-4 animate-spin ml-1" />
+          </button>
+
+          <!-- Vote Status Indicator -->
+          <div v-if="hasVoted" class="hidden sm:flex items-center gap-2 text-primary-600 font-medium">
+            <CheckCircleIcon class="w-5 h-5" />
+            <span class="text-sm">You voted!</span>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div v-if="error" class="mt-3 bg-red-50 border-l-4 border-red-500 p-3 rounded">
+          <div class="flex items-start gap-2">
+            <AlertCircleIcon class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <p class="text-sm text-red-800 font-medium">{{ error }}</p>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div class="card-body">
-      <a :href="restaurant.google_link" target="_blank" rel="noopener noreferrer" class="google-link">
-        <span class="map-icon">📍</span>
-        View on Maps
-      </a>
-    </div>
-
-    <div class="card-footer">
-      <button
-        @click="handleVote"
-        :disabled="hasVoted || voteLimit"
-        :class="{ voted: hasVoted, 'vote-limit': voteLimit }"
-        class="vote-button"
-      >
-        <span class="button-icon" v-if="hasVoted">✓</span>
-        <span class="button-icon" v-else-if="voteLimit">⚠️</span>
-        <span class="button-icon" v-else>👍</span>
-        <span class="button-text">
-          <span v-if="hasVoted">Voted</span>
-          <span v-else-if="voteLimit">Limit</span>
-          <span v-else>Vote</span>
-        </span>
-      </button>
-    </div>
-
-    <div v-if="error" class="error-message">
-      {{ error }}
-    </div>
-
-    <div v-if="isLoading" class="loading">
-      Voting...
     </div>
   </div>
 </template>
 
 <script>
-import { recordVote, getUserVotedRestaurants, getUserVoteCount } from '../utils/restaurants';
+import { recordVote } from '../utils/restaurants';
+import {
+  Star as StarIcon,
+  MapPin as MapPinIcon,
+  ExternalLink as ExternalLinkIcon,
+  ThumbsUp as ThumbsUpIcon,
+  CheckCircle as CheckCircleIcon,
+  AlertCircle as AlertCircleIcon,
+  Loader2 as Loader2Icon,
+  Lock as LockIcon
+} from 'lucide-vue-next';
 
 export default {
   name: 'RestaurantCard',
+  components: {
+    StarIcon,
+    MapPinIcon,
+    ExternalLinkIcon,
+    ThumbsUpIcon,
+    CheckCircleIcon,
+    AlertCircleIcon,
+    Loader2Icon,
+    LockIcon
+  },
   props: {
     restaurant: {
       type: Object,
       required: true
+    },
+    rank: {
+      type: Number,
+      required: true
+    },
+    hasVoted: {
+      type: Boolean,
+      default: false
+    },
+    voteLimitReached: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
-      hasVoted: false,
-      voteLimit: false,
       isLoading: false,
       error: null
     };
   },
-  async mounted() {
-    await this.checkVoteStatus();
-  },
-  methods: {
-    async checkVoteStatus() {
-      try {
-        const votedRestaurants = await getUserVotedRestaurants();
-        this.hasVoted = votedRestaurants.includes(this.restaurant.id);
-
-        const voteCount = await getUserVoteCount();
-        this.voteLimit = voteCount >= 5 && !this.hasVoted;
-      } catch (err) {
-        console.error('Error checking vote status:', err);
+  computed: {
+    rankBadgeClass() {
+      if (this.rank === 1) {
+        return 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white border-2 border-yellow-300';
+      } else if (this.rank === 2) {
+        return 'bg-gradient-to-br from-gray-300 to-gray-400 text-white border-2 border-gray-200';
+      } else if (this.rank === 3) {
+        return 'bg-gradient-to-br from-orange-400 to-orange-600 text-white border-2 border-orange-300';
+      } else {
+        return 'bg-gradient-to-br from-primary-500 to-primary-600 text-white';
       }
     },
+    buttonClass() {
+      if (this.hasVoted) {
+        return 'bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 border-2 border-primary-300 cursor-not-allowed';
+      } else if (this.voteLimitReached) {
+        return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 border-2 border-gray-300 cursor-not-allowed';
+      } else {
+        return 'bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 active:scale-95';
+      }
+    },
+    buttonText() {
+      if (this.isLoading) return 'Voting...';
+      if (this.hasVoted) return 'Voted';
+      if (this.voteLimitReached) return 'Vote Limit Reached';
+      return 'Vote';
+    },
+    buttonIcon() {
+      if (this.hasVoted) return CheckCircleIcon;
+      if (this.voteLimitReached) return LockIcon;
+      return ThumbsUpIcon;
+    },
+    buttonIconClass() {
+      if (this.hasVoted) return 'fill-primary-600';
+      if (this.voteLimitReached) return '';
+      return '';
+    }
+  },
+  methods: {
     async handleVote() {
-      if (this.hasVoted || this.voteLimit || this.isLoading) return;
+      if (this.hasVoted || this.voteLimitReached || this.isLoading) return;
 
       this.isLoading = true;
       this.error = null;
 
       try {
         await recordVote(this.restaurant.id);
-        this.hasVoted = true;
-
-        // Emit event to parent to refresh restaurant list
         this.$emit('voted');
-
-        // Update vote limit status
-        const voteCount = await getUserVoteCount();
-        this.voteLimit = voteCount >= 5;
       } catch (err) {
         this.error = err.message;
         console.error('Voting error:', err);
@@ -105,201 +174,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-/* Mobile-first responsive design */
-.restaurant-card {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-}
-
-.restaurant-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  border-color: #4CAF50;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.header-left {
-  flex: 1;
-  min-width: 0;
-}
-
-.card-header h3 {
-  margin: 0;
-  font-size: 16px;
-  color: #1a1a1a;
-  font-weight: 600;
-  word-wrap: break-word;
-}
-
-.vote-count {
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: white;
-  padding: 6px 10px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.vote-icon {
-  font-size: 14px;
-}
-
-.card-body {
-  margin-bottom: 10px;
-}
-
-.google-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #1976D2;
-  text-decoration: none;
-  font-size: 13px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  background: #e3f2fd;
-}
-
-.google-link:hover {
-  background: #bbdefb;
-  color: #0d47a1;
-}
-
-.map-icon {
-  font-size: 16px;
-}
-
-.card-footer {
-  display: flex;
-  gap: 6px;
-}
-
-.vote-button {
-  flex: 1;
-  padding: 10px 12px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 40px;
-}
-
-.button-icon {
-  font-size: 16px;
-}
-
-.button-text {
-  flex: 1;
-  text-align: center;
-}
-
-.vote-button:hover:not(:disabled) {
-  background: #45a049;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
-}
-
-.vote-button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.vote-button:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.vote-button.voted {
-  background: linear-gradient(135deg, #81C784 0%, #66BB6A 100%);
-}
-
-.vote-button.vote-limit {
-  background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
-}
-
-.error-message {
-  color: #c62828;
-  font-size: 12px;
-  margin-top: 8px;
-  padding: 8px 10px;
-  background: #ffebee;
-  border-radius: 6px;
-  border-left: 3px solid #c62828;
-}
-
-.loading {
-  color: #666;
-  font-size: 12px;
-  margin-top: 8px;
-  text-align: center;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
-/* Tablet and larger screens */
-@media (min-width: 640px) {
-  .restaurant-card {
-    padding: 16px;
-    margin-bottom: 12px;
-    border-radius: 12px;
-  }
-
-  .card-header h3 {
-    font-size: 18px;
-  }
-
-  .vote-button {
-    padding: 10px 16px;
-    font-size: 14px;
-  }
-
-  .button-text {
-    display: inline;
-  }
-}
-
-/* Desktop screens */
-@media (min-width: 1024px) {
-  .restaurant-card {
-    padding: 18px;
-  }
-
-  .card-header h3 {
-    font-size: 20px;
-  }
-
-  .google-link {
-    font-size: 14px;
-  }
-}
-</style>

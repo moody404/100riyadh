@@ -1,292 +1,202 @@
 <template>
-  <div class="restaurant-list-container">
-    <div class="header">
-      <h1>Top 100 Restaurants in Riyadh</h1>
-      <div class="stats">
-        <div class="stat">
-          <span class="stat-label">Total Restaurants</span>
-          <span class="stat-value">{{ restaurants.length }}</span>
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header with Stats -->
+      <div class="mb-8">
+        <div class="text-center mb-6">
+          <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-3">
+            <TrophyIcon class="w-10 h-10 text-amber-500" />
+            Best Restaurants in Riyadh
+          </h1>
+          <p class="text-gray-600">Vote for your favorite restaurants and help others discover great places!</p>
         </div>
-        <div class="stat">
-          <span class="stat-label">Your Votes</span>
-          <span class="stat-value">{{ userVoteCount }}/5</span>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div class="card p-6 hover:border-primary-500 transition-all">
+            <div class="flex items-center gap-4">
+              <div class="p-3 bg-primary-100 rounded-full">
+                <StoreIcon class="w-6 h-6 text-primary-600" />
+              </div>
+              <div>
+                <p class="text-sm text-gray-600 font-medium">Total Restaurants</p>
+                <p class="text-2xl font-bold text-gray-900">{{ stats.totalRestaurants }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-6 hover:border-amber-500 transition-all">
+            <div class="flex items-center gap-4">
+              <div class="p-3 bg-amber-100 rounded-full">
+                <StarIcon class="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <p class="text-sm text-gray-600 font-medium">Total Votes</p>
+                <p class="text-2xl font-bold text-gray-900">{{ stats.totalVotes }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-6 hover:border-blue-500 transition-all">
+            <div class="flex items-center gap-4">
+              <div class="p-3 bg-blue-100 rounded-full">
+                <CheckCircleIcon class="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p class="text-sm text-gray-600 font-medium">Your Votes</p>
+                <p class="text-2xl font-bold text-gray-900">{{ userVoteCount }}<span class="text-sm text-gray-500">/5</span></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-6 hover:border-purple-500 transition-all">
+            <div class="flex items-center gap-4">
+              <div class="p-3 bg-purple-100 rounded-full">
+                <TrendingUpIcon class="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <p class="text-sm text-gray-600 font-medium">Showing</p>
+                <p class="text-2xl font-bold text-gray-900">{{ restaurants.length }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vote Limit Banner -->
+        <div v-if="userVoteCount >= 5" class="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-lg mb-6">
+          <div class="flex items-center gap-3">
+            <InfoIcon class="w-5 h-5 text-blue-600 flex-shrink-0" />
+            <p class="text-blue-900 font-medium">You've used all 5 votes! Thanks for participating. 🎉</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div v-if="isLoading" class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading restaurants...</p>
-    </div>
+      <!-- Loading State -->
+      <div v-if="isLoading" class="flex flex-col items-center justify-center py-20">
+        <div class="relative">
+          <div class="w-16 h-16 border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin"></div>
+        </div>
+        <p class="mt-4 text-gray-600 font-medium">Loading restaurants...</p>
+      </div>
 
-    <div v-else-if="restaurants.length === 0" class="empty-state">
-      <p>No restaurants yet. Be the first to add one!</p>
-    </div>
+      <!-- Empty State -->
+      <div v-else-if="restaurants.length === 0" class="text-center py-20">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
+          <StoreIcon class="w-10 h-10 text-gray-400" />
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">No restaurants yet</h3>
+        <p class="text-gray-600 mb-6">Be the first to add a restaurant to the list!</p>
+      </div>
 
-    <div v-else class="restaurants-grid">
-      <RestaurantCard
-        v-for="(restaurant, index) in restaurants"
-        :key="restaurant.id"
-        :restaurant="restaurant"
-        @voted="refreshRestaurants"
-      >
-        <template #header>
-          <span class="rank">#{{ index + 1 }}</span>
-        </template>
-      </RestaurantCard>
-    </div>
-
-    <div v-if="userVoteCount >= 5" class="vote-limit-banner">
-      You've used all 5 votes! Thanks for voting.
+      <!-- Restaurant List -->
+      <div v-else class="space-y-4">
+        <RestaurantCard
+          v-for="(restaurant, index) in restaurants"
+          :key="restaurant.id"
+          :restaurant="restaurant"
+          :rank="index + 1"
+          :has-voted="votedRestaurantIds.includes(restaurant.id)"
+          :vote-limit-reached="userVoteCount >= 5 && !votedRestaurantIds.includes(restaurant.id)"
+          @voted="handleVoted"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import RestaurantCard from './RestaurantCard.vue';
-import { getTopRestaurants, getUserVoteCount } from '../utils/restaurants';
+import { getTopRestaurants, getUserVoteCount, getUserVotedRestaurants, getRestaurantStats } from '../utils/restaurants';
 import { supabase } from '../supabaseClient';
+import {
+  Trophy as TrophyIcon,
+  Store as StoreIcon,
+  Star as StarIcon,
+  CheckCircle as CheckCircleIcon,
+  TrendingUp as TrendingUpIcon,
+  Info as InfoIcon
+} from 'lucide-vue-next';
 
 export default {
   name: 'RestaurantList',
   components: {
-    RestaurantCard
+    RestaurantCard,
+    TrophyIcon,
+    StoreIcon,
+    StarIcon,
+    CheckCircleIcon,
+    TrendingUpIcon,
+    InfoIcon
   },
   data() {
     return {
       restaurants: [],
+      votedRestaurantIds: [],
       userVoteCount: 0,
+      stats: {
+        totalRestaurants: 0,
+        totalVotes: 0
+      },
       isLoading: true
     };
   },
   async mounted() {
-    await this.loadRestaurants();
-    await this.loadUserVoteCount();
+    await this.loadData();
     this.setupRealtimeListener();
   },
   methods: {
-    async loadRestaurants() {
+    async loadData() {
       this.isLoading = true;
       try {
-        const data = await getTopRestaurants(100);
-        // Sort by vote count (highest first)
-        this.restaurants = data.sort((a, b) => b.vote_count - a.vote_count);
+        // Load all data in parallel - fixes N+1 query problem
+        const [restaurants, votedIds, voteCount, stats] = await Promise.all([
+          getTopRestaurants(1000),
+          getUserVotedRestaurants(),
+          getUserVoteCount(),
+          getRestaurantStats()
+        ]);
+
+        this.restaurants = restaurants.sort((a, b) => b.vote_count - a.vote_count);
+        this.votedRestaurantIds = votedIds;
+        this.userVoteCount = voteCount;
+        this.stats = stats;
       } catch (err) {
-        console.error('Error loading restaurants:', err);
+        console.error('Error loading data:', err);
       } finally {
         this.isLoading = false;
       }
     },
-    async loadUserVoteCount() {
-      try {
-        this.userVoteCount = await getUserVoteCount();
-      } catch (err) {
-        console.error('Error loading user vote count:', err);
-      }
-    },
-    async refreshRestaurants() {
-      await this.loadRestaurants();
-      await this.loadUserVoteCount();
+    async handleVoted() {
+      await this.loadData();
     },
     setupRealtimeListener() {
-      // Subscribe to changes in votes table (INSERT and UPDATE)
+      // Subscribe to changes in votes table
       supabase
         .channel('votes')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'votes' },
           () => {
-            this.refreshRestaurants();
+            this.loadData();
           }
         )
         .subscribe();
 
-      // Subscribe to changes in restaurants table (INSERT and UPDATE)
+      // Subscribe to changes in restaurants table
       supabase
         .channel('restaurants')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'restaurants' },
           () => {
-            this.refreshRestaurants();
+            this.loadData();
           }
         )
         .subscribe();
     }
   },
   beforeUnmount() {
-    // Clean up subscriptions
     supabase.removeAllChannels();
   }
 };
 </script>
-
-<style scoped>
-/* Mobile-first responsive design */
-.restaurant-list-container {
-  width: 100%;
-  margin: 0 auto;
-  padding: 12px;
-}
-
-.header {
-  margin-bottom: 20px;
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  padding: 16px;
-  border-radius: 12px;
-  color: white;
-}
-
-.header h1 {
-  margin: 0 0 12px 0;
-  color: white;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.stats {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.stat {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 10px 12px;
-  border-radius: 8px;
-  flex: 1;
-  min-width: 140px;
-}
-
-.stat-label {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stat-value {
-  color: white;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  color: #666;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f0f0f0;
-  border-top: 4px solid #4CAF50;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
-  background: white;
-  border: 2px dashed #e0e0e0;
-  border-radius: 12px;
-  font-size: 15px;
-}
-
-.restaurants-grid {
-  display: grid;
-  gap: 8px;
-}
-
-.rank {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.vote-limit-banner {
-  margin-top: 20px;
-  padding: 14px 16px;
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  border-left: 4px solid #1976D2;
-  border-radius: 8px;
-  color: #1565c0;
-  font-size: 13px;
-  font-weight: 500;
-  text-align: center;
-}
-
-/* Tablet screens */
-@media (min-width: 640px) {
-  .restaurant-list-container {
-    padding: 16px;
-  }
-
-  .header {
-    padding: 20px;
-    margin-bottom: 24px;
-  }
-
-  .header h1 {
-    font-size: 26px;
-  }
-
-  .stat {
-    min-width: 160px;
-    padding: 12px 14px;
-  }
-
-  .restaurants-grid {
-    gap: 10px;
-  }
-}
-
-/* Desktop screens */
-@media (min-width: 1024px) {
-  .restaurant-list-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-
-  .header {
-    padding: 24px;
-    margin-bottom: 32px;
-  }
-
-  .header h1 {
-    font-size: 28px;
-  }
-
-  .stat {
-    min-width: 180px;
-  }
-
-  .restaurants-grid {
-    gap: 12px;
-  }
-}
-</style>

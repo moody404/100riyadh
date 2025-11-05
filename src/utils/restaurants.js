@@ -2,9 +2,9 @@ import { supabase } from '../supabaseClient';
 import { getDeviceId } from './deviceId';
 
 /**
- * Get top 100 restaurants sorted by vote count
+ * Get all restaurants sorted by vote count (removed limit for better display)
  */
-export async function getTopRestaurants(limit = 100) {
+export async function getTopRestaurants(limit = 1000) {
   const { data, error } = await supabase
     .from('restaurants')
     .select('*')
@@ -17,6 +17,38 @@ export async function getTopRestaurants(limit = 100) {
   }
 
   return data || [];
+}
+
+/**
+ * Get restaurant statistics
+ */
+export async function getRestaurantStats() {
+  try {
+    // Get total restaurants
+    const { count: totalRestaurants, error: restaurantError } = await supabase
+      .from('restaurants')
+      .select('*', { count: 'exact', head: true });
+
+    if (restaurantError) throw restaurantError;
+
+    // Get total votes
+    const { count: totalVotes, error: voteError } = await supabase
+      .from('votes')
+      .select('*', { count: 'exact', head: true });
+
+    if (voteError) throw voteError;
+
+    return {
+      totalRestaurants: totalRestaurants || 0,
+      totalVotes: totalVotes || 0
+    };
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    return {
+      totalRestaurants: 0,
+      totalVotes: 0
+    };
+  }
 }
 
 /**
