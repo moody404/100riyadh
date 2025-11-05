@@ -49,11 +49,20 @@
       </div>
 
       <!-- Debug Info (remove after testing) -->
-      <div v-if="!isLoading" class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
+      <div v-if="!isLoading" class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm space-y-2">
         <p class="font-semibold text-yellow-900">Debug Info:</p>
         <p class="text-yellow-800">Restaurants loaded: {{ restaurants.length }}</p>
         <p class="text-yellow-800">Total restaurants in DB: {{ stats.totalRestaurants }}</p>
         <p class="text-yellow-800">Total votes in DB: {{ stats.totalVotes }}</p>
+        <p class="text-yellow-800">Your voted restaurants: {{ votedRestaurantIds.length }}</p>
+        <details class="mt-2">
+          <summary class="cursor-pointer text-yellow-900 font-semibold hover:underline">Show all restaurant names</summary>
+          <ul class="mt-2 pl-4 space-y-1">
+            <li v-for="(r, idx) in restaurants" :key="r.id" class="text-yellow-800 text-xs">
+              {{ idx + 1 }}. {{ r.name }} - {{ r.vote_count }} votes (ID: {{ r.id ? 'exists' : 'MISSING' }})
+            </li>
+          </ul>
+        </details>
       </div>
     </div>
   </div>
@@ -109,8 +118,22 @@ export default {
 
         console.log('Restaurants loaded:', restaurants.length);
         console.log('Stats:', stats);
+        console.log('Full restaurant data:', restaurants);
+
+        // Check for missing fields
+        restaurants.forEach((r, index) => {
+          if (!r.id) console.error(`Restaurant ${index} missing ID:`, r);
+          if (!r.name) console.error(`Restaurant ${index} missing name:`, r);
+          if (!r.google_link) console.error(`Restaurant ${index} missing google_link:`, r);
+          if (r.vote_count === undefined || r.vote_count === null) {
+            console.warn(`Restaurant "${r.name}" has invalid vote_count:`, r.vote_count);
+          }
+        });
 
         this.restaurants = restaurants.sort((a, b) => b.vote_count - a.vote_count);
+
+        console.log('Restaurants after sorting:', this.restaurants.length);
+        console.log('First 5 restaurants:', this.restaurants.slice(0, 5));
         this.votedRestaurantIds = votedIds;
         this.userVoteCount = voteCount;
         this.stats = stats;
